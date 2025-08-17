@@ -11,6 +11,7 @@ os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
 
 # Attendance log file
 ATTENDANCE_FILE = "attendance.csv"
+MODEL_FILE = "hcr_model.h5"
 
 # Create attendance file if not exists
 if not os.path.exists(ATTENDANCE_FILE):
@@ -38,8 +39,17 @@ def train_model():
 
     model.compile(optimizer="adam", loss="sparse_categorical_crossentropy", metrics=["accuracy"])
     model.fit(x_train, y_train, epochs=3, validation_data=(x_test, y_test))
-    model.save("hcr_model.h5")
+    model.save(MODEL_FILE)
     st.success("✅ Model trained & saved!")
+    return model
+
+# Function to load or train model
+def get_model():
+    if os.path.exists(MODEL_FILE):
+        return tf.keras.models.load_model(MODEL_FILE)
+    else:
+        st.warning("⚠️ Model not found. Training a new one...")
+        return train_model()
 
 # Function to mark attendance
 def mark_attendance(name):
@@ -50,7 +60,7 @@ def mark_attendance(name):
 
 # Predict digit from image
 def predict_image(image):
-    model = tf.keras.models.load_model("hcr_model.h5")
+    model = get_model()
     img = cv2.imdecode(np.frombuffer(image.read(), np.uint8), cv2.IMREAD_GRAYSCALE)
     img = cv2.resize(img, (28,28))
     img = img.astype("float32") / 255.0

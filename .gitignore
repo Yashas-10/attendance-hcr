@@ -1,4 +1,13 @@
-venv/ 
-__pycache__/ 
-*.h5 
-*.csv 
+# Ignore virtual environment
+venv/
+.env/
+
+# Ignore cache & temporary files
+__pycache__/
+*.pyc
+
+# Ignore model weights (too large for GitHub / Streamlit)
+*.h5
+
+# Ignore attendance logs (generated at runtime)
+*.csv
